@@ -38,7 +38,19 @@ class IPv4:
     dst: str
 
     def __init__(self, buffer: bytes):
-        pass  # TODO
+        bitstring = ''.join(format(byte, '08b') for byte in [*buffer])
+        self.version = int(bitstring[:4], base=2)
+        self.header_len = int(bitstring[4:8], base=2)
+        self.tos = buffer[1]
+        self.length = int.from_bytes(buffer[2:4], "big")
+        self.id = int.from_bytes(buffer[4:6], "big")
+        self.flags = int(bitstring[48:48+3], base=2)
+        self.frag_offset = util.ntohs(int(bitstring[51:64], base=2))
+        self.ttl = buffer[8]
+        self.proto = buffer[9]
+        self.cksum = int.from_bytes(buffer[10:12], "big")
+        self.src = int.from_bytes(buffer[12:16], "big")
+        self.dst = int.from_bytes(buffer[16:20], "big")
 
     def __str__(self) -> str:
         return f"IPv{self.version} (tos 0x{self.tos:x}, ttl {self.ttl}, " + \
